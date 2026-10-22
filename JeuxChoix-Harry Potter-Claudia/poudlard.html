@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<!-- Pourquoi : viewport-fit=cover permet de gérer correctement les écrans des smartphones avec encoches -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Poudlard – L’Aventure des Quatre Maisons</title>
+<!-- Pourquoi : Importation des polices thématiques depuis Google Fonts pour l'ambiance magique -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<!-- Pourquoi : Liaison avec le fichier CSS externe séparé pour garder un code propre -->
+<link rel="stylesheet" href="poudlard.css">
+</head>
+<body>
+
+<!-- Pourquoi : Élément graphique global pour afficher le fond étoilé animé en arrière-plan -->
+<canvas id="stars"></canvas>
+
+<!--  ÉCRAN TITRE  -->
+<section id="title" class="screen">
+  <div class="moon"></div>
+  <p class="sub">ENTREZ À POUDLARD. ÉCRIVEZ VOTRE PROPRE LÉGENDE.</p>
+  <h1>Poudlard</h1>
+  <p class="tagline">Quatre maisons, mille ans d'histoire et à quelle maison confieras-tu ton avenir ?</p>
+  <button class="btn" id="play">Jouer</button>
+  
+  <!-- Pourquoi : Illustration SVG intégrée du château pour un rendu net sur tous les écrans sans image lourde -->
+  <svg class="castle" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <path fill="#0b0d24" d="M0 300V230l60-10v-40l15-30 15 30v40l70 8V200h40v-70l20-40 20 40v70h30v-90l25-70 25 70v90h60v30l60-6v-80l15-45 15 45v80h50V150h30l15-60 15 60h30v100l90-8v-60h25l30-90 30 90h25v70l100 6v-50h40v-110l22-60 22 60v110h45v-40l40-8v-60l18-40 18 40v60l70 10V230l60-14v84z"/>
+    <g fill="#ffd36a"><rect x="108" y="190" width="6" height="10"/><rect x="288" y="150" width="6" height="12"/><rect x="396" y="120" width="6" height="12"/><rect x="528" y="170" width="6" height="10"/><rect x="742" y="140" width="6" height="12"/><rect x="905" y="150" width="6" height="12"/><rect x="1005" y="190" width="6" height="10"/></g>
+  </svg>
+</section>
+
+<!-- Petite parenthese sur le pourquoi on ne voie pas de balise <img> dans mon tp alors que mon projet contien des images -->
+
+<!-- Le SVG (Graphiques Vectoriels) pour le château et les blasons
+Au lieu d'insérer une image, le code dessine directement les formes géométriques.
+
+Comment ça marche : Le code utilise des balises comme <svg>, <path> (chemins) et <rect> (rectangles). C'est comme un plan mathématique qui trace les contours du château ou du blason de Poudlard directement dans le navigateur. -->
+
+
+<!--  ÉCRAN DE JEU / CARTE AVEC DES PATS / LA CARTE DU MARAUDEUR -->
+<section id="game" class="screen off">
+  <article class="parchment" id="parch">
+    <p class="chap" id="chap"></p>
+    <div class="trail" id="trail"></div>
+    <h2 id="stitle"></h2>
+    <p id="text"></p>
+    <div id="zone"></div>
+  </article>
+</section>
+
+<!-- Pourquoi : Chargement du script à la fin pour que le DOM soit entièrement chargé avant l'exécution -->
+<script src="poudlard.js"></script>
+</body>
+</html>

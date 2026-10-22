@@ -1,0 +1,519 @@
+
+/* 1. VARIABLES GLOBALES ET CONFIGURATION DE BASE */
+/* Pourquoi : Centraliser les couleurs et polices permet de modifier le thème */
+/* facilité la cohérence visuelle dans tout le projet.         */
+
+:root {
+  --night: #07091a;       /* Couleur de fond nuit étoilée */
+  --gold: #e8c46a;        /* Or principal pour les titres */
+  --gold2: #a8791f;       /* Or secondaire / ombres */
+  --ink: #3b2410;         /* Couleur encre ancienne pour le texte du parchemin */
+  --parch1: #ecd9a8;      /* Teinte claire du parchemin */
+  --parch2: #c9a768;      /* Teinte sombre du parchemin (dégradé) */
+  --c1: #740001;          /* Couleur principale de maison (Gryffondor par défaut) */
+  --c2: #d3a625;          /* Couleur secondaire de maison */
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: var(--night);
+  color: #f3e7c7;
+  font-family: 'IM Fell English', Georgia, serif;
+  overflow-x: hidden; /* Empêche le défilement horizontal indésirable */
+}
+
+/* Toile de fond pour les étoiles : fixée pour rester en arrière-plan pendant le scroll */
+canvas#stars {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Gestion de l'affichage des différents écrans du jeu (titre vs jeu) */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: opacity 1.2s ease, visibility 1.2s;
+}
+
+/* La classe .off masque l'écran en douceur avec une transition fluide */
+.screen.off {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none; /* Désactive les clics sur un écran caché */
+}
+
+
+
+/* 2. ÉCRAN DE TITRE  */
+
+#title {
+  flex-direction: column;
+  text-align: center;
+  padding: 24px;
+  background: radial-gradient(ellipse at 50% 110%, #2a1a4e 0%, transparent 60%);
+}
+
+.castle {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 42vh;
+  z-index: -1;
+  opacity: .95;
+}
+
+/* Lune avec effet lumineux pulsé dans le premier film on voie le chateau eluminer avec la lune j'ai egalement reproduit cette scene  */
+.moon {
+  position: absolute;
+  top: 8vh;
+  right: 12vw;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fffbe8, #e9d9a0 60%, #bfa965);
+  box-shadow: 0 0 80px 20px rgba(255, 240, 180, .25);
+  animation: glow 6s ease-in-out infinite;
+}
+
+@keyframes glow {
+  50% { box-shadow: 0 0 110px 34px rgba(255, 240, 180, .35); }
+}
+
+.sub {
+  font-family: 'Cinzel', serif;
+  letter-spacing: .45em;
+  color: var(--gold);
+  font-size: clamp(.7rem, 2vw, 1rem); /* clamp() adapte la taille fluidement selon l'écran */
+  opacity: 0;
+  animation: rise 2s .4s forwards;
+}
+
+/* Titre principal avec effet de brillance dorée en mouvement  */
+h1 {
+  font-family: 'Cinzel Decorative', Georgia, serif;
+  font-weight: 900;
+  font-size: clamp(2.6rem, 10vw, 6.4rem);
+  line-height: 1.05;
+  margin: .3em 0 .2em;
+  background: linear-gradient(100deg, #8a5f12 10%, #fff1b8 30%, #e8c46a 45%, #8a5f12 60%, #fff1b8 80%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 6s linear infinite, rise 2.2s .8s both;
+  filter: drop-shadow(0 4px 24px rgba(232, 196, 106, .35));
+}
+
+@keyframes shine {
+  to { background-position: -250% 0; }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+
+.tagline {
+  max-width: 34ch;
+  font-style: italic;
+  font-size: clamp(1rem, 2.6vw, 1.35rem);
+  color: dre;
+  color: #d9c9a0;
+  opacity: 0;
+  animation: rise 2s 1.6s forwards;
+  margin-bottom: 2.2rem;
+}
+
+/* Bouton principal stylisé façon grimoire magique */
+.btn {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  color: #2a1805;
+  background: linear-gradient(180deg, #f6dc8c, #c8932c);
+  border: 0;
+  border-radius: 60px;
+  padding: 1rem 3rem;
+  font-size: 1.2rem;
+  letter-spacing: .2em;
+  cursor: pointer;
+  box-shadow: 0 0 0 2px #7a5412 inset, 0 8px 30px rgba(232, 196, 106, .35);
+  transition: transform .3s, box-shadow .3s;
+  opacity: 0;
+  animation: rise 2s 2.2s forwards, pulse 2.8s 4s infinite;
+}
+
+.btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 2px #7a5412 inset, 0 0 60px rgba(255, 220, 120, .7);
+}
+
+.btn:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+@keyframes pulse {
+  50% { box-shadow: 0 0 0 2px #7a5412 inset, 0 0 50px rgba(255, 220, 120, .6); }
+}
+
+/* Bougies flottantes magiques en arrière-plan en reference a la grande salle a poudlard ou le ciel change normal il est enchanter je voulais faire un hommage  */
+.candle {
+  position: absolute;
+  width: 12px;
+  height: 56px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #d8ccaa, #fff6dc, #cdbf99);
+  animation: float 7s ease-in-out infinite;
+  z-index: -1;
+}
+
+.candle::before {
+  content: "";
+  position: absolute;
+  top: -22px;
+  left: 1px;
+  width: 10px;
+  height: 22px;
+  border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+  background: radial-gradient(ellipse at 50% 70%, #fff 10%, #ffd36a 45%, rgba(255, 140, 30, 0) 75%);
+  box-shadow: 0 0 28px 12px rgba(255, 190, 70, .5);
+  animation: flick .15s infinite alternate;
+}
+
+@keyframes float {
+  50% { transform: translateY(-22px); }
+}
+
+@keyframes flick {
+  to { transform: scale(1.12, .92) rotate(2deg); }
+}
+
+
+
+/* 3. CARTE DU MARAUDEUR ET INTERFACE DE JEU  les petit pas qui acompagne l'utilisateur a chaque choix jussqu'a la maison pour la quel il destiner                               */
+
+#game {
+  background: radial-gradient(ellipse at center, #1a1030, #07091a 70%);
+  padding: 16px;
+  overflow-y: auto;
+  align-items: flex-start;
+}
+
+/* Style parchemin avec textures superposées pour simuler du vieux papier le monde des sorcier utilise des parchemin je souhaite reproduir cette texture avec cette surperposition */
+.parchment {
+  position: relative;
+  width: 100%;
+  max-width: 780px;
+  margin: auto;
+  padding: clamp(22px, 5vw, 54px);
+  color: var(--ink);
+  background: radial-gradient(ellipse at 20% 15%, rgba(255, 255, 255, .35), transparent 50%),
+              radial-gradient(ellipse at 80% 90%, rgba(120, 70, 20, .35), transparent 55%),
+              linear-gradient(160deg, var(--parch1), var(--parch2));
+  border-radius: 6px;
+  box-shadow: inset 0 0 90px rgba(90, 50, 10, .65), 0 30px 80px rgba(0, 0, 0, .8), 0 0 120px rgba(232, 196, 106, .12);
+  transform-origin: top center;
+  animation: unfold 1.6s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+@keyframes unfold {
+  from { transform: scaleY(.04) rotateX(40deg); opacity: 0; }
+  60% { opacity: 1; }
+  to { transform: none; }
+}
+
+.parchment::after {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border: 2px solid rgba(80, 45, 15, .45);
+  border-radius: 3px;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg, transparent 0 22px, rgba(80, 45, 15, .05) 22px 23px);
+}
+
+.chap {
+  font-family: 'Cinzel', serif;
+  text-align: center;
+  font-size: .85rem;
+  letter-spacing: .3em;
+  color: #7a4a1a;
+}
+
+.trail {
+  position: relative;
+  height: 54px;
+  margin: 6px 0 4px;
+  overflow: hidden;
+}
+
+.trail::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 2px dotted rgba(80, 45, 15, .35);
+}
+
+/* Empreintes de pas animées style Carte du Maraudeur */
+/* chaque carte qui apparait les petit pas comme dans la carte du maraudeur dans les film */
+.foot {
+  position: absolute;
+  width: 12px;
+  height: 22px;
+  opacity: 0;
+  animation: step .6s forwards;
+  transform: rotate(90deg);
+}
+
+.foot::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 14px;
+  border-radius: 50% 50% 45% 45%;
+  background: #4a2a10;
+}
+
+.foot::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 2px;
+  width: 8px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4a2a10;
+}
+
+@keyframes step {
+  from { opacity: 0; transform: rotate(90deg) scale(.4); }
+  to { opacity: .8; transform: rotate(90deg) scale(1); }
+}
+
+h2 {
+  font-family: 'Cinzel Decorative', serif;
+  text-align: center;
+  font-size: clamp(1.4rem, 4.4vw, 2.2rem);
+  color: #2c1606;
+  margin: .1em 0 .6em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .4);
+}
+
+#text {
+  font-size: clamp(1.15rem, 2.8vw, 1.45rem);
+  line-height: 1.65;
+  min-height: 8.5em;
+}
+
+/* Curseur clignotant simulant l'écriture magique de la plume pour le coté magique de l'univers*/
+#text .cur {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--ink);
+  margin-left: 2px;
+  vertical-align: -2px;
+  animation: blink .7s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.choices {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.choice {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+  background: rgba(255, 248, 225, .35);
+  border: 2px solid rgba(80, 45, 15, .55);
+  border-radius: 4px;
+  padding: 14px 18px;
+  opacity: 0;
+  transform: translateX(-18px);
+  animation: slide .7s forwards;
+  transition: background .3s, transform .3s, box-shadow .3s;
+}
+
+.choice:hover {
+  background: rgba(255, 248, 225, .75);
+  transform: translateX(8px);
+  box-shadow: -6px 0 0 #691515;
+}
+
+.choice:focus-visible {
+  outline: 3px solid #7a1f1f;
+}
+
+.choice.picked {
+  background: rgba(122, 31, 31, .18);
+  border-color: #7a1f1f;
+}
+
+.choices.done .choice:not(.picked) {
+  opacity: .25;
+  pointer-events: none;
+}
+
+@keyframes slide {
+  to { opacity: 1; transform: none; }
+}
+
+.lore {
+  margin-top: 22px;
+  padding: 16px 20px;
+  border-left: 5px solid #7a1f1f;
+  background: rgba(120, 70, 20, .14);
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  animation: slide .9s forwards;
+  opacity: 0;
+}
+
+.lore b {
+  font-style: normal;
+  font-family: 'Cinzel', serif;
+  font-size: .9rem;
+  letter-spacing: .12em;
+  color: #7a1f1f;
+}
+
+.next {
+  margin: 20px auto 0;
+  display: block;
+  opacity: 1;
+  animation: none;
+  font-size: 1rem;
+  padding: .8rem 2.2rem;
+  background: linear-gradient(180deg, #8d2a2a, #5a1010);
+  color: #f7e7b0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+}
+
+
+
+/* 4. ÉCRAN DE RÉSULTAT DE LA RÉPARTITION QUEL MAISON EST TU   */
+
+.result {
+  text-align: center;
+  animation: slide 1.2s forwards;
+  opacity: 0;
+}
+
+.crest {
+  width: 170px;
+  height: 200px;
+  margin: 0 auto 6px;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, .5));
+  animation: crest 1.8s cubic-bezier(.2, 1.4, .3, 1) both;
+}
+
+@keyframes crest {
+  from { transform: scale(0) rotate(-30deg); }
+  to { transform: none; }
+}
+
+.hname {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(2rem, 7vw, 3.4rem);
+  color: var(--c1);
+  text-shadow: 0 2px 0 var(--c2);
+}
+
+.hist {
+  font-size: 1.2rem;
+  line-height: 1.65;
+  margin: 12px 0 18px;
+  text-align: left;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.facts div {
+  background: rgba(255, 248, 225, .4);
+  border-top: 4px solid var(--c1);
+  padding: 10px 12px;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.facts b {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: .8rem;
+  color: var(--c1);
+  margin-bottom: 3px;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+  font-family: 'Cinzel', serif;
+  font-size: .85rem;
+}
+
+.bar span:first-child {
+  width: 96px;
+  text-align: right;
+}
+
+.bar i {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  width: 0;
+  transition: width 1.6s cubic-bezier(.2, .8, .2, 1);
+}
+
+.bar .tr {
+  flex: 1;
+  background: rgba(80, 45, 15, .2);
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: .01s !important;
+    animation-delay: 0s !important;
+    transition-duration: .01s !important;
+  }
+}
